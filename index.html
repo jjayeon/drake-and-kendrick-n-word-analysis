@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drake vs. Kendrick N-Word Counts</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script> 
+  </head>
+  <body>
+    <h1 id="h"></h1>
+    <div style="font-size:20px;font-weight:bold;">
+	<p id="total"></p>
+	<p id="avg"></p>
+    </div>
+    <div id="btns"></div>
+    <div id="vis" style="font-size:20px;"></div>
+    <script src="drake_songs.js"></script>
+    <script src="kendrick_songs.js"></script>
+    <script>
+      // defined: drake_songs, kendrick_songs
+
+      const drake_songs_by_year = {};
+      
+      for (let d of drake_songs) {
+	  const year = d["release_date"].split("-")[0]
+	  if (drake_songs_by_year[year] === undefined) {
+	      drake_songs_by_year[year] = {
+		  "total": 0,
+		  "count": 0,
+	      };
+	  }
+	  drake_songs_by_year[year]["total"] += parseInt(d["n_words"]);
+	  drake_songs_by_year[year]["count"] += 1;
+      }
+
+      const drake_songs_by_year_list = [];
+
+      for (let year in drake_songs_by_year) {
+	  drake_songs_by_year_list.push({
+	      "title": "Total N-Words",
+	      "release_date": year + "-01-02",
+	      "n_words": drake_songs_by_year[year]["total"],
+	      "album": "N/A",
+	  });
+
+	  drake_songs_by_year_list.push({
+	      "title": "Avg N-Words",
+	      "release_date": year + "-01-02",
+	      "n_words": (drake_songs_by_year[year]["total"] / drake_songs_by_year[year]["count"]).toFixed(2),
+	      "album": "N/A",
+	  });
+      }
+
+      let drake_total = 0;
+      let drake_count = 0;
+      for (let d of drake_songs) {
+	  drake_total += parseInt(d["n_words"]);
+	  drake_count += 1;
+      }
+
+      const kendrick_songs_by_year = {};
+      
+      for (let d of kendrick_songs) {
+	  const year = d["release_date"].split("-")[0]
+	  if (kendrick_songs_by_year[year] === undefined) {
+	      kendrick_songs_by_year[year] = {
+		  "total": 0,
+		  "count": 0,
+	      };
+	  }
+	  kendrick_songs_by_year[year]["total"] += parseInt(d["n_words"]);
+	  kendrick_songs_by_year[year]["count"] += 1;
+      }
+
+      const kendrick_songs_by_year_list = [];
+
+      for (let year in kendrick_songs_by_year) {
+	  kendrick_songs_by_year_list.push({
+	      "title": "Total N-Words",
+	      "release_date": year + "-01-02",
+	      "n_words": kendrick_songs_by_year[year]["total"],
+	      "album": "N/A",
+	  })
+	  kendrick_songs_by_year_list.push({
+	      "title": "Avg N-Words",
+	      "release_date": year + "-01-02",
+	      "n_words": (kendrick_songs_by_year[year]["total"] / kendrick_songs_by_year[year]["count"]).toFixed(2),
+	      "album": "N/A",
+	  })
+      }
+
+      let kendrick_total = 0;
+      let kendrick_count = 0;
+      for (let d of kendrick_songs) {
+	  kendrick_total += parseInt(d["n_words"]);
+	  kendrick_count += 1;
+      }
+
+      const datasets = {
+	  "Drake Songs": drake_songs,
+	  "Drake Songs By Year": drake_songs_by_year_list,
+	  "Kendrick Songs": kendrick_songs,
+	  "Kendrick Songs By Year": kendrick_songs_by_year_list
+      };
+
+      const overall = {
+	  "drake_total": drake_total,
+	  "drake_avg": (drake_total / drake_count).toFixed(2),
+	  "kendrick_total": kendrick_total,
+	  "kendrick_avg": (kendrick_total / kendrick_count).toFixed(2),
+      };
+
+      function renderChart(data) {
+	  const spec = {
+	      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	      "description": "Drake Songs: N-Word Count vs. Release Date",
+	      "width": 1600, 
+	      "height": 600,
+	      "data": {
+		  "values": data,
+	      },
+	      "mark": 
+	      {
+		  "type": "point",
+		  "size": 400,
+	      },
+	      "encoding": {
+		  "x": {
+		      "field": "release_date",
+		      "type": "temporal",
+		      "timeUnit": "yearmonthdate", 
+		      "title": "Release Year",
+		      "axis": {
+			  "labelAngle": -30,
+			  "titleFontSize": 20,
+			  "labelFontSize": 16,
+		      },
+		  },
+		  "y": {
+		      "field": "n_words",
+		      "type": "quantitative",
+		      "title": "N-Word Count",
+		      "axis": {
+			  "titleFontSize": 20,
+			  "labelFontSize": 16,
+		      },
+		  },
+		  "tooltip": [
+		      {"field": "title", "type": "nominal"},
+		      {"field": "album", "type": "nominal"},
+		      {"field": "release_date", "type": "temporal"},
+		      {"field": "n_words", "type": "quantitative"},
+		  ]
+	      }
+	  }
+	  
+	  vegaEmbed('#vis', spec);
+      }
+
+      function mkButton(dataset) {
+	  const button = document.createElement('button');
+	  button.textContent = dataset;
+	  button.addEventListener('click', () => {
+	      renderChart(datasets[dataset]);
+	      document.getElementById("h").innerHTML = dataset;
+
+	      const artist_name = dataset.split(" ")[0].toLowerCase();
+	      document.getElementById("total").innerHTML = "total: " + overall[artist_name + "_total"];
+	      document.getElementById("avg").innerHTML = "avg: " + overall[artist_name + "_avg"];
+	  });
+	  document.getElementById("btns").appendChild(button);
+	  return button;
+      }
+
+      let btns = [];
+      for (let dataset in datasets) {
+	  btns.push(mkButton(dataset));
+      }
+      btns[0].click();
+
+    </script>
+  </body>
+</html>
