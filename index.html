@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Drake vs. Kendrick N-Word Counts</title>
+    <title>Drake vs. Kendrick N-Word Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script> 
   </head>
   <body>
-    <h1 id="h"></h1>
-    <div style="font-size:20px;font-weight:bold;">
-	<p id="total"></p>
-	<p id="avg"></p>
-    </div>
+    <h1>Drake vs. Kendrick N-Word Analysis</h1>
+    <table style="font-size:20px;font-weight:bold;">
+      <tr>
+	<td id="h" style="width:300px;"></td>
+	<td id="total" style="width:300px;"></td>
+	<td id="avg"></td>
+      </tr>
+    </table>
     <div id="btns"></div>
     <div id="vis" style="font-size:20px;"></div>
     <script src="drake_songs.js"></script>
@@ -114,8 +117,8 @@
 	  const spec = {
 	      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
 	      "description": "Drake Songs: N-Word Count vs. Release Date",
-	      "width": 1600, 
-	      "height": 600,
+	      "width": window.innerWidth - 150,
+	      "height": window.innerHeight - 300,
 	      "data": {
 		  "values": data,
 	      },
@@ -132,8 +135,8 @@
 		      "title": "Release Year",
 		      "axis": {
 			  "labelAngle": -30,
-			  "titleFontSize": 20,
-			  "labelFontSize": 16,
+			  "titleFontSize": 30,
+			  "labelFontSize": 14,
 		      },
 		  },
 		  "y": {
@@ -141,8 +144,8 @@
 		      "type": "quantitative",
 		      "title": "N-Word Count",
 		      "axis": {
-			  "titleFontSize": 20,
-			  "labelFontSize": 16,
+			  "titleFontSize": 26,
+			  "labelFontSize": 20,
 		      },
 		  },
 		  "tooltip": [
@@ -165,8 +168,8 @@
 	      document.getElementById("h").innerHTML = dataset;
 
 	      const artist_name = dataset.split(" ")[0].toLowerCase();
-	      document.getElementById("total").innerHTML = "total: " + overall[artist_name + "_total"];
-	      document.getElementById("avg").innerHTML = "avg: " + overall[artist_name + "_avg"];
+	      document.getElementById("total").innerHTML = "total n-words: " + overall[artist_name + "_total"];
+	      document.getElementById("avg").innerHTML = "avg n-words per song: " + overall[artist_name + "_avg"];
 	  });
 	  document.getElementById("btns").appendChild(button);
 	  return button;
